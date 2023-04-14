@@ -22,11 +22,24 @@ def scrape_updates(html_content):
 
 
 def scrape_next_page_link(html_content):
-    """Seu código deve vir aqui"""
+    selector = Selector(html_content)
+    return selector.css("span.current ~ a.page-numbers::attr(href)").get()
 
 
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
+    selector = Selector(html_content)
+    return {
+        "url": selector.css("link[rel=canonical]::attr(href)").get(),
+        "title": selector.css(".entry-title::text").get().strip(),
+        "timestamp": selector.css(".meta-date::text").get().strip(),
+        "writer": selector.css(".author > a::text").get(),
+        "reading_time": int(selector.css(".meta-reading-time::text").get()
+                            .split(" ")[0]),
+        "summary": "".join(selector.css(
+                                    ".entry-content > p:nth-of-type(1) *::text"
+                                    ).getall()).strip(),
+        "category": selector.css("span.label::text").get(),
+    }
 
 
 def get_tech_news(amount):
